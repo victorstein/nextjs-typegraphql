@@ -1,0 +1,67 @@
+version: "3.9"
+services:
+  web:
+    container_name: next-graphql-web
+    build: ./
+    volumes:
+      - ./:/app
+      - node_module_web:/app/node_modules
+    ports:
+      - 3000:3000
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?schema=public
+    healthcheck:
+      test: ["CMD-SHELL", "node healthcheck.js"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+    depends_on:
+      db:
+        condition: service_healthy
+      prisma-migrate:
+        condition: service_completed_successfully
+
+  graphql-codegen:
+    container_name: graphql-code-generator
+    build:
+      context: ./
+      dockerfile: hooks/dockerfile
+    volumes:
+      - ./:/app
+      - node_module_web:/app/node_modules
+    depends_on:
+      web:
+        condition: service_healthy
+
+  prisma-migrate:
+    container_name: prisma-migrate-dev
+    build:
+      context: prisma
+      dockerfile: dockerfile
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}?schema=public
+    network_mode: "host"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    container_name: next-graphql-db
+    image: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $$POSTGRES_DB -U $$POSTGRES_USER"]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB}
+
+volumes:
+  node_module_web:
+  postgres-data:

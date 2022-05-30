@@ -1,0 +1,14 @@
+FROM node:16.14.2-slim
+
+# install open ssl
+RUN apt-get update
+RUN apt-get install -y openssl
+
+# set working directory
+WORKDIR /app
+
+# install prisma and copy required files
+RUN npm install -g prisma
+COPY ./ ./prisma/
+
+CMD [ "prisma", "migrate", "dev", "--skip-generate"]

@@ -1,0 +1,13 @@
+overwrite: true
+schema: "schema.gql"
+documents: "components/**/graphql/{queries,mutations}.ts"
+generates:
+  hooks/generated/hooks.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-react-apollo
+    config:
+      skipTypename: true
+      omitOperationSuffix: true
+      withRefetchFn: true

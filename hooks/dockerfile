@@ -1,0 +1,12 @@
+FROM node:16.15.0-alpine
+
+# Set working directory
+WORKDIR /app
+
+COPY package.json yarn.lock /app/
+
+# Install the dependencies
+COPY . .
+
+# start the dev servers
+CMD yarn codegen --watch

@@ -1,0 +1,23 @@
+{
+  "extends": [
+    "standard-with-typescript",
+    "standard-jsx",
+    "next/core-web-vitals",
+    "plugin:prettier/recommended"
+  ],
+  "parserOptions": { "project": "./tsconfig.json" },
+  "rules": {
+    "prettier/prettier": [
+      "error",
+      {
+        "trailingComma": "none",
+        "tabWidth": 2,
+        "semi": false,
+        "singleQuote": true,
+        "bracketSpacing": true,
+        "eslintIntegration": true
+      }
+    ]
+  },
+  "ignorePatterns": ["./**/generated"]
+}
